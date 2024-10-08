@@ -16,9 +16,9 @@ namespace Movie2024.Controllers
     public class HomeController : Controller
     {
         private readonly ILogger<HomeController> _logger;
-        private readonly movieContext _movieContext; // ¥ı¦b¥ş°ì«Å§i¸ê®Æ®wª«¥ó
+        private readonly movieContext _movieContext; // å…ˆåœ¨å…¨åŸŸå®£å‘Šè³‡æ–™åº«ç‰©ä»¶
 
-        public HomeController(ILogger<HomeController> logger, movieContext movieContext) // ¨Ì¿àª`¤J¨Ï¥Î§Ú­Ì­è³]©w¦nªº¸ê®Æ®wª«¥óªº¼gªk
+        public HomeController(ILogger<HomeController> logger, movieContext movieContext) // ä¾è³´æ³¨å…¥ä½¿ç”¨æˆ‘å€‘å‰›è¨­å®šå¥½çš„è³‡æ–™åº«ç‰©ä»¶çš„å¯«æ³•
         {
             _logger = logger;
             _movieContext = movieContext;
@@ -31,19 +31,19 @@ namespace Movie2024.Controllers
             {
                 return userId;
             }
-            // ¦pªG§ä¤£¨ì¥Î¤á ID ©ÎµLªk¸ÑªR¡A¥i¥H©ß¥X²§±`©Îªğ¦^¤@­ÓÀq»{­È
-            //throw new ApplicationException("µLªkÀò¨ú·í«e¥Î¤á ID");
+            // å¦‚æœæ‰¾ä¸åˆ°ç”¨æˆ¶ ID æˆ–ç„¡æ³•è§£æï¼Œå¯ä»¥æ‹‹å‡ºç•°å¸¸æˆ–è¿”å›ä¸€å€‹é»˜èªå€¼
+            //throw new ApplicationException("ç„¡æ³•ç²å–ç•¶å‰ç”¨æˆ¶ ID");
             return 0;
         }
 
-        public IActionResult Index()    //­º­¶
+        public IActionResult Index()    //é¦–é 
         {
             var model = _movieContext.Movies.ToList();
 
-            var userId = GetCurrentUserID(); // ¨ú±o¥Ø«e¥Î¤á ID
+            var userId = GetCurrentUserID(); // å–å¾—ç›®å‰ç”¨æˆ¶ ID
             var user = userId > 0 ? _movieContext.Users.FirstOrDefault(u => u.UserID == userId) : null;
 
-            ViewBag.UserName = user != null ? user.UserName : "¶Q»«"; 
+            ViewBag.UserName = user != null ? user.UserName : "è²´è³“"; 
 
             return View(model);
         }
@@ -57,7 +57,7 @@ namespace Movie2024.Controllers
             return View(model);
         }
 
-        public IActionResult Privacy()  //¹q¼v¤¶²Ğ
+        public IActionResult Privacy()  //é›»å½±ä»‹ç´¹
         {
             var model = _movieContext.Movies.ToList();
             return View(model);
@@ -66,44 +66,36 @@ namespace Movie2024.Controllers
         [Authorize]
         public IActionResult OrderSeat(int id)
         {
-            System.Diagnostics.Debug.WriteLine("Test: " + id);
             var movie = _movieContext.Movies.Find(id);
 
-            // ®Ú¾Ú MovieID ¬d§ä©Ò¦³³õ¦¸
+            // æ ¹æ“š MovieID æŸ¥æ‰¾æ‰€æœ‰å ´æ¬¡
             var showtimes = _movieContext.Showtimes
                 .Where(s => s.MovieID == id)
                 .ToList();
 
-            System.Diagnostics.Debug.WriteLine("Test2: " + id);
-            System.Diagnostics.Debug.WriteLine("Test2: " + showtimes);
-            System.Diagnostics.Debug.WriteLine("Test2: " + showtimes.Count);
-            var userId = GetCurrentUserID(); // ¨ú±o¥Ø«e¥Î¤á ID
+            var userId = GetCurrentUserID(); // å–å¾—ç›®å‰ç”¨æˆ¶ ID
 
             var user = _movieContext.Users.FirstOrDefault(u => u.UserID == userId);
             if (user != null)
             {
-                ViewBag.UserName = user.UserName; // ±N UserName ¶Ç»¼¨ì«eºİ
-                System.Diagnostics.Debug.WriteLine("Test3: " + id);
+                ViewBag.UserName = user.UserName; // å°‡ UserName å‚³éåˆ°å‰ç«¯
             }
             else
             {
-                System.Diagnostics.Debug.WriteLine("Test4: " + id);
-                ViewBag.UserName = "¥¼ª¾ªº¨Ï¥ÎªÌ"; // ¦pªGµLªk§ä¨ì¥Î¤á¡AÅã¥ÜÀq»{­È
+                ViewBag.UserName = "æœªçŸ¥çš„ä½¿ç”¨è€…"; // å¦‚æœç„¡æ³•æ‰¾åˆ°ç”¨æˆ¶ï¼Œé¡¯ç¤ºé»˜èªå€¼
             }
 
-            System.Diagnostics.Debug.WriteLine("Test5: " + id);
             if (movie == null )
             {
                 return NotFound();
             }
 
-            System.Diagnostics.Debug.WriteLine("Test6: " + id);
-            // §ä¨ì©Ò¦³¹ïÀ³ªº TheaterID
+            // æ‰¾åˆ°æ‰€æœ‰å°æ‡‰çš„ TheaterID
 
             if (showtimes.Any())
             {
                 var theaterIds = showtimes.Select(s => s.TheaterID).Distinct().ToList();
-                // ®Ú¾Ú TheaterID ¬d§ä©Ò¦³¹ïÀ³ªº¼vÆU¸ê®Æ
+                // æ ¹æ“š TheaterID æŸ¥æ‰¾æ‰€æœ‰å°æ‡‰çš„å½±å»³è³‡æ–™
                 var theaters = _movieContext.Theaters
                     .Where(t => theaterIds.Contains(t.TheaterID))
                     .ToList();
@@ -141,13 +133,13 @@ namespace Movie2024.Controllers
         [HttpPost]
         public async Task<IActionResult> OrderCheck(int ShowtimeID, string SelectedSeats, decimal TotalAmount)
         {
-            // ¸ÑªR¿ï©wªº®y¦ì ID
+            // è§£æé¸å®šçš„åº§ä½ ID
             var seatIDs = JsonConvert.DeserializeObject<List<int>>(SelectedSeats);
 
-            // ³Ğ«Ø·sªº­q³æ
+            // å‰µå»ºæ–°çš„è¨‚å–®
             var order = new Orders
             {
-                UserID = GetCurrentUserID(), // °²³]±z¦³¤@­Ó¤èªk¨ÓÀò¨ú·í«e¥Î¤á ID
+                UserID = GetCurrentUserID(), // å‡è¨­æ‚¨æœ‰ä¸€å€‹æ–¹æ³•ä¾†ç²å–ç•¶å‰ç”¨æˆ¶ ID
                 ShowtimeID = ShowtimeID,
                 TotalAmount = TotalAmount,
                 CreatedAt = DateTime.Now
@@ -156,7 +148,7 @@ namespace Movie2024.Controllers
             _movieContext.Orders.Add(order);
             await _movieContext.SaveChangesAsync();
 
-            // ¬°¨C­Ó¿ï©wªº®y¦ì³Ğ«Ø OrderSeat °O¿ı
+            // ç‚ºæ¯å€‹é¸å®šçš„åº§ä½å‰µå»º OrderSeat è¨˜éŒ„
             foreach (var seatID in seatIDs)
             {
                 var orderSeat = new OrderSeats
@@ -166,23 +158,23 @@ namespace Movie2024.Controllers
                 };
                 _movieContext.OrderSeats.Add(orderSeat);
 
-                // §ó·s ShowtimeSeats ªí¤¤¹ïÀ³®y¦ìªº¥i¥Îª¬ºA
+                // æ›´æ–° ShowtimeSeats è¡¨ä¸­å°æ‡‰åº§ä½çš„å¯ç”¨ç‹€æ…‹
                 var showtimeSeat = await _movieContext.ShowtimeSeats
                     .FirstOrDefaultAsync(ss => ss.ShowtimeID == ShowtimeID && ss.SeatID == seatID);
                 if (showtimeSeat == null)
                 {
-                    // ¦pªG¤£¦s¦b¡A³Ğ«Ø·s°O¿ı
+                    // å¦‚æœä¸å­˜åœ¨ï¼Œå‰µå»ºæ–°è¨˜éŒ„
                     showtimeSeat = new ShowtimeSeats
                     {
                         ShowtimeID = ShowtimeID,
                         SeatID = seatID,
-                        IsAvailable = "Y"  // ªì©lª¬ºA³]¬°¥i¥Î
+                        IsAvailable = "Y"  // åˆå§‹ç‹€æ…‹è¨­ç‚ºå¯ç”¨
                     };
                     _movieContext.ShowtimeSeats.Add(showtimeSeat);
                 }
                 if (showtimeSeat != null)
                 {
-                    showtimeSeat.IsAvailable = "N";  // ³]©w¸Ó®y¦ì¬°¤£¥i¥Î
+                    showtimeSeat.IsAvailable = "N";  // è¨­å®šè©²åº§ä½ç‚ºä¸å¯ç”¨
                 }
             }
 
@@ -194,22 +186,22 @@ namespace Movie2024.Controllers
         [HttpGet]
         public IActionResult GetBookedSeats(int showtimeID)
         {
-            // ¬d§ä¸Ó³õ¦¸¤¤¤w³Q¹w­qªº®y¦ì
+            // æŸ¥æ‰¾è©²å ´æ¬¡ä¸­å·²è¢«é è¨‚çš„åº§ä½
             var bookedSeats = _movieContext.ShowtimeSeats
                 .Where(ss => ss.ShowtimeID == showtimeID && ss.IsAvailable == "N")
-                .Select(ss => ss.Seats.SeatNumber) // ¿ï¾Ü®y¦ì½s¸¹
+                .Select(ss => ss.Seats.SeatNumber) // é¸æ“‡åº§ä½ç·¨è™Ÿ
                 .ToList();
 
             return Json(new { bookedSeats });
         }
 
-        public IActionResult OrderSuccess(int orderId)  //³Ì²×­q³æªº¸Ô²Ó«H®§
+        public IActionResult OrderSuccess(int orderId)  //æœ€çµ‚è¨‚å–®çš„è©³ç´°ä¿¡æ¯
         {     
             var order = _movieContext.Orders
-                .Include(o => o.OrderSeats) // ¥]§t»P®y¦ìªºÃöÁp
-                .ThenInclude(os => os.Seats)  // ¥]§t®y¦ì¸Ô²Ó¸ê®Æ
-                .Include(o => o.Showtimes)    // ¥]§t³õ¦¸¸Ô²Ó¸ê®Æ
-                .ThenInclude(s => s.Movies)  // ³o¸Ì½T«O³õ¦¸³s±a¹q¼v¦WºÙ³Q¬d¥X¨Ó
+                .Include(o => o.OrderSeats) // åŒ…å«èˆ‡åº§ä½çš„é—œè¯
+                .ThenInclude(os => os.Seats)  // åŒ…å«åº§ä½è©³ç´°è³‡æ–™
+                .Include(o => o.Showtimes)    // åŒ…å«å ´æ¬¡è©³ç´°è³‡æ–™
+                .ThenInclude(s => s.Movies)  // é€™è£¡ç¢ºä¿å ´æ¬¡é€£å¸¶é›»å½±åç¨±è¢«æŸ¥å‡ºä¾†
                 .FirstOrDefault(o => o.OrderID == orderId);
 
             if (order == null)
@@ -217,7 +209,7 @@ namespace Movie2024.Controllers
                 return NotFound();
             }
 
-            // ±N­q³æ¸ê®Æ¶Ç»¼¨ìµø¹Ï
+            // å°‡è¨‚å–®è³‡æ–™å‚³éåˆ°è¦–åœ–
             return View(order);
         }
 
